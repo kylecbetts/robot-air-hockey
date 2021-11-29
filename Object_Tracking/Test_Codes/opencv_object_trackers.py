@@ -19,7 +19,7 @@ if __name__ == '__main__' :
     # Instead of MIL, you can also use
 
     tracker_types = ['BOOSTING', 'MIL','KCF', 'TLD', 'MEDIANFLOW', 'GOTURN', 'MOSSE', 'CSRT']
-    tracker_type = tracker_types[2]
+    tracker_type = tracker_types[6]
 
     if int(minor_ver) < 3:
         tracker = cv2.Tracker_create(tracker_type)
@@ -37,7 +37,7 @@ if __name__ == '__main__' :
         if tracker_type == 'GOTURN':
             tracker = cv2.TrackerGOTURN_create()
         if tracker_type == 'MOSSE':
-            tracker = cv2.TrackerMOSSE_create()
+            tracker = cv2.legacy.TrackerMOSSE_create()
         if tracker_type == "CSRT":
             tracker = cv2.TrackerCSRT_create()
 
