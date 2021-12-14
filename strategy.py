@@ -1,3 +1,6 @@
+'''
+strategy.py program
+'''
 from multiprocessing import Process, Pipe
 from motors import motors
 import math
@@ -86,6 +89,7 @@ def terminate_strategy():
     if motors_p != 0:
         if motors_p.is_alive():
             motors_p.terminate()
+            print("Motors terminated")
         motors_p.close()
     # If motors connection initialized
     if motors_conn != 0:

@@ -1,3 +1,7 @@
+'''
+motors.py program
+'''
+
 import time
 import RPi.GPIO as GPIO
 from multiprocessing import Process, Pipe
@@ -29,6 +33,7 @@ done = 0
 MAX_FREQ = 500
 MIN_FREQ = 5
 accel_ramp = 0.1
+linear_accel_ramp=5
 
 # PWM
 freq = MIN_FREQ # Motors always at same speed
@@ -39,6 +44,7 @@ def slow_to_stop():
     global freq
     while freq > MIN_FREQ:
         freq -= freq*accel_ramp
+        #freq -= linear_accel_ramp
     #Stop
     pwm1.ChangeDutyCycle(0)
     pwm2.ChangeDutyCycle(0)
@@ -51,6 +57,7 @@ def slow_down():
     
     if freq > MIN_FREQ:
         freq -= freq*accel_ramp
+        #freq -= linear_accel_ramp
     else:
         #Stop
         pwm1.ChangeDutyCycle(0)
@@ -70,7 +77,8 @@ def speed_up():
         pwm2.ChangeDutyCycle(50)
 
     if freq < MAX_FREQ:
-        freq += freq*accel_ramp
+        #freq += freq*accel_ramp
+        freq += linear_accel_ramp
     else:
         freq = MAX_FREQ
 
@@ -108,7 +116,6 @@ def terminate_motors():
     pwm2.stop()
     GPIO.cleanup()
     done = 1
-    exit()
 
 
 def motors(conn):
