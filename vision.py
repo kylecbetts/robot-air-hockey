@@ -45,14 +45,14 @@ robot_min_area = 50
 robot_located = False
 
 # Table Globals
-table_top_left = [0, 0]
-table_top_right = [CAM_WIDTH, 0]
-table_bottom_left = [0, CAM_HEIGHT]
-table_bottom_right = [CAM_WIDTH, CAM_HEIGHT]
-table_middle_top = (CAM_WIDTH/2, 0)
-table_middle_bottom = (CAM_WIDTH/2, CAM_HEIGHT)
+table_top_left = [25, 68]
+table_top_right = [636, 60]
+table_bottom_left = [30, 370]
+table_bottom_right = [640, 362]
+table_middle_top = ((table_top_left[0] + table_top_right[0]) / 2, (table_top_left[1] + table_top_right[1]) / 2)
+table_middle_bottom = ((table_bottom_left[0] + table_bottom_right[0]) / 2, (table_bottom_left[1] + table_bottom_right[1]) / 2)
 table_min_area = 100000
-table_max_area = 200000
+table_max_area = 190000
 table_located = False
 
 # Conversion Globals
@@ -111,8 +111,7 @@ def draw_table():
     cv.polylines(frame, [pts], True, (255,0,0), 4)
 
     # Draw table center line
-    cv.line(frame, table_middle_top, table_middle_bottom, (0,0,255), 4)
-
+    #cv.line(frame, table_middle_top, table_middle_bottom, (0,0,255), 4)
 
 def initialize_strategy_process():
     global strategy_conn, stategy_p
@@ -191,6 +190,12 @@ def find_puck_and_robot():
                 robot_y = int(y)
                 robot_r = int(r)
                 robot_x_cord, robot_y_cord = pixels_to_table_cordinates(robot_x, robot_y)
+    if not puck_located:
+        puck_x_cord = -1
+        puck_y_cord = -1
+    if not robot_located:
+        robot_y_cord = -1
+        robot_y_cord = -1
 
 
 def draw_puck_and_robot():
@@ -218,8 +223,10 @@ def vision(conn):
     # Initialize Camera Globals
     initialize_camera(cap)
 
+    i = 0
     # Calibrate Table 
-    while (not table_located):
+    while (not table_located and i < 30):
+        i += 1
         ret, frame = cap.read()
         calibrate_table()
         cv.imshow('frame', frame)
@@ -232,6 +239,7 @@ def vision(conn):
     while(True):
         # If not game, wait for message to start
         if not game_on:
+            #print("DEBUG: GAME NOT ON")
             msg = air_hockey_conn.recv()
             if msg[0] == 2:
                 if msg[1]:
@@ -243,12 +251,13 @@ def vision(conn):
                 cv.destroyAllWindows()
                 terminate_vision()
         else:
+            #print("DEBUG: GAME IS ON")
             # Capture the video frame by frame
             ret, frame = cap.read()
             if not ret:
                 print("Cannot receive frame. Exiting...")
                 break
-
+             
             # Find puck and robot then draw them
             find_puck_and_robot()
             draw_puck_and_robot()
