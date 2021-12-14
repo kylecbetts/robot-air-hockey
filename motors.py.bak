@@ -129,9 +129,6 @@ def motors(conn):
         msg = strategy_conn.recv()
         if msg[0] == 0:
             terminate_motors()
-            pwm1.stop()
-            pwm2.stop()
-            print("Motors have been stopped")
         else:
             update_motors(msg[1])
             print(msg)
