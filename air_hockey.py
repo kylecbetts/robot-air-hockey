@@ -14,6 +14,8 @@ from vision import vision
 # Connection Globals
 vision_conn = 0
 vision_p = 0
+motor_conn = 0
+motor_p = 0
 
 # Env variables for TFT
 #os.putenv('SDL_VIDEODRIVER','fbcon')
@@ -110,7 +112,7 @@ def initialize_vision_process():
 
 def air_hockey():
     global code_run, game_on
-
+    
     # Initialize Vision Process
     print("Initializing vision")
     initialize_vision_process()
@@ -137,6 +139,7 @@ def air_hockey():
                     if exit_text_rect.collidepoint(pos):
                         game_on = False
                         vision_conn.send([2, False])
+                        print("Air Hockey -> Vision Pause")
 
         # Draw Screen
         if game_on:

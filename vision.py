@@ -58,8 +58,9 @@ table_located = False
 # Conversion Globals
 TABLE_HEIGHT = 48.0
 TABLE_WIDTH = 98.0
-pix_to_cordinates_x_scalar = TABLE_WIDTH / CAM_WIDTH
-pix_to_cordinates_y_scalar = TABLE_HEIGHT / CAM_HEIGHT
+TABLE_PADDING = 5.0
+pix_to_cordinates_x_scalar = TABLE_WIDTH / (table_top_right[0] - table_top_left[0])
+pix_to_cordinates_y_scalar = TABLE_HEIGHT / (table_bottom_right[1] - table_top_right[1])
 
 # Game Globals
 game_on = False
@@ -145,15 +146,27 @@ def pixels_to_table_cordinates(pix_x, pix_y):
     cord_y = 0
     # If on players side
     if pix_x < table_middle_top[0]:
-        cord_y = math.floor((pix_y - table_top_left[1]) * pix_to_cordinates_y_scalar)
+        cord_y = (pix_y - table_top_left[1]) * pix_to_cordinates_y_scalar
     # If on robot side
     else:
-        cord_y = math.floor((pix_y - table_top_right[1]) * pix_to_cordinates_y_scalar)
+        cord_y = (pix_y - table_top_right[1]) * pix_to_cordinates_y_scalar
+
     cord_x = 0
     if cord_y < TABLE_HEIGHT / 2:
-        cord_x = math.floor((pix_x - table_top_left[0]) * pix_to_cordinates_x_scalar) 
+        cord_x = (pix_x - table_top_left[0]) * pix_to_cordinates_x_scalar
     else: 
-        cord_x = math.floor((pix_x - table_bottom_left[0]) * pix_to_cordinates_x_scalar) 
+        cord_x = (pix_x - table_bottom_left[0]) * pix_to_cordinates_x_scalar
+
+    # Safety Checks
+    if cord_y < TABLE_PADDING:
+        cord_y = TABLE_PADDING
+    elif cord_y > TABLE_HEIGHT - TABLE_PADDING:
+        cord_y = TABLE_HEIGHT - TABLE_PADDING
+    if cord_x < TABLE_PADDING:
+        cord_x = TABLE_PADDING
+    elif cord_x > TABLE_WIDTH - TABLE_PADDING:
+        cord_x = TABLE_WIDTH - TABLE_PADDING
+
     return (cord_x, cord_y)
 
 
@@ -239,7 +252,6 @@ def vision(conn):
     while(True):
         # If not game, wait for message to start
         if not game_on:
-            #print("DEBUG: GAME NOT ON")
             msg = air_hockey_conn.recv()
             if msg[0] == 2:
                 if msg[1]:
@@ -251,7 +263,6 @@ def vision(conn):
                 cv.destroyAllWindows()
                 terminate_vision()
         else:
-            #print("DEBUG: GAME IS ON")
             # Capture the video frame by frame
             ret, frame = cap.read()
             if not ret:
@@ -263,6 +274,7 @@ def vision(conn):
             draw_puck_and_robot()
 
             # Send puck and robot cordinates to strategy
+            print("Cordinates: {} {} {}".format(puck_x_cord, puck_y_cord, robot_y_cord))
             strategy_conn.send([3, puck_x_cord, puck_y_cord, robot_x_cord, robot_y_cord])
 
             # Draw Table Lines
