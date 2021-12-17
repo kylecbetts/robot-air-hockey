@@ -106,6 +106,7 @@ def initialize_vision_process():
     vision_p.start()
     # Wait for vision process to initalize
     vision_init = vision_conn.recv()
+    # If message type is wrong or got False returned
     if not (vision_init[0] == 1 and vision_init[1]):
         terminate_air_hockey()
 

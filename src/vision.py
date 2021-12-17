@@ -83,11 +83,6 @@ def calibrate_table():
     if not (contours is None): 
         for cnt in contours:
             area = cv.contourArea(cnt)
-            cv.drawContours(frame, [cnt], 0, (255,0,0), 3)
-            rect = cv.minAreaRect(cnt)
-            box = cv.boxPoints(rect)
-            box = np.int0(box)
-            cv.drawContours(frame, [box], 0, (0,255,0), 3)
             # Check if table
             if area < table_max_area and area > table_min_area:
                 rect = cv.minAreaRect(cnt)
@@ -111,8 +106,6 @@ def draw_table():
     pts = pts.reshape((-1,1,2))
     cv.polylines(frame, [pts], True, (255,0,0), 4)
 
-    # Draw table center line
-    #cv.line(frame, table_middle_top, table_middle_bottom, (0,0,255), 4)
 
 def initialize_strategy_process():
     global strategy_conn, stategy_p
@@ -274,7 +267,6 @@ def vision(conn):
             draw_puck_and_robot()
 
             # Send puck and robot cordinates to strategy
-            print("Cordinates: {} {} {}".format(puck_x_cord, puck_y_cord, robot_y_cord))
             strategy_conn.send([3, puck_x_cord, puck_y_cord, robot_x_cord, robot_y_cord])
 
             # Draw Table Lines
